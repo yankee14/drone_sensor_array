@@ -1,0 +1,5 @@
+**/*.cproject
+**/*.swp
+**/*.project
+**/*.settings/
+**/*Debug/

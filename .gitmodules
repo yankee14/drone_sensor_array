@@ -1,0 +1,3 @@
+[submodule "doc/GPS/Adafruit_GPS"]
+	path = doc/GPS/Adafruit_GPS
+	url = git@github.com:adafruit/Adafruit-Ultimate-GPS.git

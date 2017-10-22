@@ -1,0 +1,19 @@
+GPS:
+    Overview: https://www.youtube.com/watch?v=6A99O-mCZSM
+    25mA tracking, 20mA during navigation
+    3.3V native, 5V-safe
+    NMEA 0183 sentences, 9600 baud, see: 
+    Warm/cold start: 34 seconds
+    Internal patch antenna, externa u.FL connector for external active antenna
+    < 3m accuracy
+    10 Hz
+    Built-in data logging
+    PPS output
+    Fix-LED
+    50km altitude
+
+    Network:
+        1.575 GHz
+
+Env Sensor:
+    
