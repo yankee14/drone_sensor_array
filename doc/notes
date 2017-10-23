@@ -1,4 +1,5 @@
 GPS:
+    Datsheet:
     Overview: https://www.youtube.com/watch?v=6A99O-mCZSM
     25mA tracking, 20mA during navigation
     3.3V native, 5V-safe
@@ -16,4 +17,10 @@ GPS:
         1.575 GHz
 
 Env Sensor:
-    
+
+    Together the sensors can consume 13 mA of current. It takes 12 mA to power the CCS811 while 1 mA to power the BME280.
+
+    BME280 (humidity, temperature, barometric pressure):
+
+    CCS811 (C02, volatile organic):
+

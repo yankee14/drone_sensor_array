@@ -15,8 +15,11 @@
 
 #define I2CWRITE 	0b0U
 #define I2CREAD		0b1U
+#define I2CACK      1
+#define I2CNACK     0
 
 void I2C0init(void);
+void I2C0init2(uint32_t I2SCLL, uint32_t I2SCLH);
 void I2C0start(void);
 void I2C0stop(void);
 void I2C0write(uint32_t data);
