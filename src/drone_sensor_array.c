@@ -3,7 +3,7 @@
  Name        : drone_sensor_array.c
  Author      : Ed Peguillan III
  Version     : R0.1a
- Description : Test bed for UART GPS sesnor and IIC environmental sensor for
+ Description : Test bed for UART GPS sesnor and IIC environmental sensors for
                drone project @ Univ of Oklahoma
 ===============================================================================
 */
@@ -28,35 +28,35 @@ int main(void)
     init();
 
     for(;;) {
-        _delay_ms(2000);
+        _delay_ms(2000); // pause microcontroller 2 seconds
 
-        printf("Error ID: 0x%02X\n", get_ERROR_ID());
+        printf("Error ID: 0x%02X\n", get_ERROR_ID()); // print error register
 
-        printf("Status: 0x%02X\n", get_STATUS());
+        printf("Status: 0x%02X\n", get_STATUS()); // print status register
 
-        printf("Error ID: 0x%02X\n", get_ERROR_ID());
+        printf("Error ID: 0x%02X\n", get_ERROR_ID()); // print error register
 
-        printf("Hardware ID read: 0x%02X, should read: 0x81\n", get_HW_ID());
+        printf("Hardware ID read: 0x%02X, should read: 0x81\n", get_HW_ID()); // print HW_ID register
 
-        printf("Error ID: 0x%02X\n", get_ERROR_ID());
+        printf("Error ID: 0x%02X\n", get_ERROR_ID()); // print error register
 
         uint32_t result[8];
-        get_ALG_RESULT_DATA(result, 8);
+        get_ALG_RESULT_DATA(result, 8); // get CO2 and TVOC
 
-        printf("Error ID: 0x%02X\n", get_ERROR_ID());
+        printf("Error ID: 0x%02X\n", get_ERROR_ID()); // print error register
 
         printf("Result: ");
         for(uint32_t i = 0; i < 8; i++)
-            printf("0x%02X ", result[i]);
+            printf("0x%02X ", result[i]); // print CO2, TVOC, status register, error register, and RAW_DATA
         printf("\n");
 
-        printf("Error ID: 0x%02X\n", get_ERROR_ID());
+        printf("Error ID: 0x%02X\n", get_ERROR_ID()); // print error register
 
-        printf("Status: 0x%02X\n", get_STATUS());
+        printf("Status: 0x%02X\n", get_STATUS()); // print status register
 
-        printf("Error: 0x%02X\n", get_ERROR_ID());
+        printf("Error: 0x%02X\n", get_ERROR_ID()); // print error register
 
-        printf("Measure Mode: 0x%02X\n", get_MEAS_MODE());
+        printf("Measure Mode: 0x%02X\n", get_MEAS_MODE()); // print measure_mode register
     }
 
     return 0 ;
