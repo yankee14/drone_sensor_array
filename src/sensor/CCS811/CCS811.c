@@ -8,7 +8,8 @@
 */
 
 #include "CCS811.h"
-#include "../util/i2c.h"
+
+#include "../../util/i2c.h"
 
 /**
  * Ensure the device is out of BOOT mode, and into running mode
@@ -28,10 +29,7 @@ void initCCS811(uint32_t drive_mode)
     if( !(status & CCS811_STATUS_FW_MODE_MASK) ) // check again
         for(;;); // don't continue
 
-    uint32_t meas_mode = get_MEAS_MODE();
     set_MEAS_MODE(drive_mode << CCS811_DRIVE_MODE);
-    meas_mode = get_MEAS_MODE();
-    int i = 0;
 }
 
 uint32_t get_STATUS(void)

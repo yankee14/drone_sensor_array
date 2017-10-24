@@ -10,7 +10,7 @@
 #ifndef _SENSOR_CCS811_H_
 #define _SENSOR_CCS811_H_
 
-#include "../types.h"
+#include "../../types.h"
 
 #define CCS811_I2C_ADDR 0x5BU
 
