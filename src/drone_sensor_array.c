@@ -13,6 +13,7 @@
 #include "util/delay.h"
 #include "util/i2c.h"
 #include <stdio.h>
+#include <time.h>
 
 #define ADDR_BME280 0x77
 
@@ -27,8 +28,15 @@ int main(void)
 {
     init();
 
+    time_t rawtime;
+    struct tm* timeinfo;
+
     for(;;) {
-        _delay_ms(2000); // pause microcontroller 2 seconds
+        _delay_ms(1000 * 60); // pause microcontroller 2 seconds
+
+        time(&rawtime);
+        timeinfo = localtime(&rawtime);
+        printf("Current local time and date: %s", asctime (timeinfo));
 
         printf("Error ID: 0x%02X\n", get_ERROR_ID()); // print error register
 
@@ -56,7 +64,7 @@ int main(void)
 
         printf("Error: 0x%02X\n", get_ERROR_ID()); // print error register
 
-        printf("Measure Mode: 0x%02X\n", get_MEAS_MODE()); // print measure_mode register
+        printf("Measure Mode: 0x%02X\n\n\n", get_MEAS_MODE()); // print measure_mode register
     }
 
     return 0 ;
