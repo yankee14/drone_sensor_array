@@ -1,3 +1,6 @@
 [submodule "doc/Env/BME280_driver"]
 	path = doc/Env/BME280_driver
 	url = https://github.com/BoschSensortec/BME280_driver.git
+[submodule "doc/GPS/Adafruit_GPS"]
+	path = doc/GPS/Adafruit_GPS
+	url = https://github.com/adafruit/Adafruit_GPS.git
