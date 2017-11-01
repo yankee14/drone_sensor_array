@@ -1,3 +1,4 @@
 [submodule "doc/GPS/Adafruit_GPS"]
 	path = doc/GPS/Adafruit_GPS
 	url = https://github.com/adafruit/Adafruit_GPS.git
+	ignore = dirty
