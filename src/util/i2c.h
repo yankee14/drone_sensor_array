@@ -18,11 +18,16 @@
 #define I2CACK      1
 #define I2CNACK     0
 
+enum {
+  I2C_ERROR_NO_SLAVE = -1,
+  I2C_ERROR_BUS_BUSY = -2
+};
+
 void I2C0init(void);
 void I2C0init2(uint32_t I2SCLL, uint32_t I2SCLH);
-void I2C0start(void);
-void I2C0stop(void);
-void I2C0write(uint32_t data);
-uint32_t I2C0read(uint32_t ack);
+uint32_t I2C0start(void);
+uint32_t I2C0stop(void);
+uint32_t I2C0write(uint32_t address, const uint32_t* data, uint32_t length, uint32_t stop);
+uint32_t I2C0read(uint32_t address, uint32_t* data, uint32_t length, uint32_t stop);
 
 #endif

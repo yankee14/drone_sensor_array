@@ -12,10 +12,11 @@
 
 #include "../../types.h"
 
-#define CCS811_I2C_ADDR 0x5BU
+#define CCS811_I2C_ADDR_PRI 0x5A
+#define CCS811_I2C_ADDR_SEC 0x5B
 
 /* STATUS register */
-#define CCS811_STATUS_ADDR      0x00U // RO
+#define CCS811_STATUS_ADDR      0x00 // RO
 #define CCS811_STATUS_NUM_BYTES 1
 /* STATUS register bits */
 #define CCS811_STATUS_ERROR        0
@@ -32,17 +33,21 @@
 #define CCS811_STATUS_RW_MASK   0
 
 /* MEAS_MODE register */
-#define CCS811_MEAS_MODE_ADDR       0x01U // RW
+#define CCS811_MEAS_MODE_ADDR       0x01 // RW
 #define CCS811_MEAS_MODE_NUM_BYTES  1
 /* MEAS_MODE register bits */
-#define CCS811_INT_THRESH       2
-#define CCS811_INT_DATARDY      3
-#define CCS811_DRIVE_MODE       4
-#define CCS811_DRIVE_MODE_0     0b000 // idle
-#define CCS811_DRIVE_MODE_1     0b001 // constant power, 1 Hz
-#define CCS811_DRIVE_MODE_2     0b010 // pulse heating, 1/10 Hz
-#define CCS811_DRIVE_MODE_3     0b011 // low power pulse heating, 1/60 Hz
-#define CCS811_DRIVE_MODE_4     0b100 // constant power, 4 Hz (ALG_RESULT_DATA register disabled)
+#define CCS811_INT_THRESH           2
+#define CCS811_INT_DATARDY          3
+#define CCS811_DRIVE_MODE           4
+#define CCS811_INT_THRESH_DISABLE   0
+#define CCS811_INT_THRESH_ENABLE    1
+#define CCS811_INT_DATARDY_DISABLE  0
+#define CCS811_INT_DATARDY_ENABLE   1
+#define CCS811_DRIVE_MODE_0         0b000 // idle
+#define CCS811_DRIVE_MODE_1         0b001 // constant power, 1 Hz
+#define CCS811_DRIVE_MODE_2         0b010 // pulse heating, 1/10 Hz
+#define CCS811_DRIVE_MODE_3         0b011 // low power pulse heating, 1/60 Hz
+#define CCS811_DRIVE_MODE_4         0b100 // constant power, 4 Hz (ALG_RESULT_DATA register disabled)
 /* MEAS_MODE register masks */
 #define CCS811_INT_THRESH_MASK      (1 << CCS811_INT_THRESH)
 #define CCS811_INT_DATARDY_MASK     (1 << CCS811_INT_DATARDY)
@@ -52,7 +57,7 @@
 #define CCS811_MEAS_MODE_RW_MASK    (CCS811_INT_THRESH_MASK | CCS811_INT_DATARDY_MASK | CCS811_DRIVE_MODE_MASK)
 
 /* ALG_RESULT_DATA register */
-#define CCS811_ALG_RESULT_DATA_ADDR         0x02U // RO
+#define CCS811_ALG_RESULT_DATA_ADDR         0x02 // RO
 #define CCS811_ALG_RESULT_DATA_NUM_BYTES    8
 /* ALG_RESULT_DATA register bits */
 #define CCS811_ALG_EC02_HIGH            0   // byte 0
@@ -66,7 +71,7 @@
 /* ALG_RESULT_DATA register masks */
 
 /* RAW_DATA register */
-#define CCS811_RAW_DATA_ADDR            0x03U // RO
+#define CCS811_RAW_DATA_ADDR            0x03 // RO
 #define CCS811_RAW_DATA_NUM_BYTES       2
 /* RAW_DATA register bits */
 #define CCS811_RAW_CURRENT              2
@@ -78,7 +83,7 @@
 #define CCS811_RAW_VOLTAGE_LOW_MASK     (0xFF << CCS811_RAW_VOLTAGE_LOW)
 
 /* ENV_DATA register */
-#define CCS811_ENV_DATA_ADDR        0x05U // WO
+#define CCS811_ENV_DATA_ADDR        0x05 // WO
 #define CCS811_ENV_DATA_NUM_BYTES   4
 /* ENV_DATA register bits */
 #define CCS811_ENV_HUMIDITY             1
@@ -96,7 +101,7 @@
 #define CCS811_ENV_TEMP_PERC_LOW_MASK       (0xFF << CCS811_ENV_TEMP_PERC_LOW)
 
 /* NTC register */
-#define CCS811_NTC_ADDR             0x06U // RO
+#define CCS811_NTC_ADDR             0x06 // RO
 #define CCS811_NTC_NUM_BYTES        4
 /* NTC register bits */
 #define CCS811_NTC_VRref_HIGH       0 // byte 0
@@ -106,12 +111,12 @@
 /* NTC register masks */
 
 /* HW_ID register */
-#define CCS811_HW_ID_ADDR           0x20U // RO
+#define CCS811_HW_ID_ADDR           0x20 // RO
 #define CCS811_HW_ID_NUM_BYTES      1
 /* HW_ID register bits */
 #define CCS811_HW_ID                0
 /* HW_ID register masks */
-#define CCS811_HW_ID_MASK           0x81U // HW ID for compare
+#define CCS811_HW_ID_MASK           0x81 // HW ID for compare
 
 /* ERROR_ID register */
 #define CCS811_ERROR_ID_ADDR        0xE0 // RO
@@ -137,8 +142,6 @@
 /* APP_START register bits */
 #define CCS811_APP_START
 /* APP_START register masks*/
-
-void initCCS811(uint32_t drive_mode);
 
 /* getters */
 uint32_t get_STATUS(void);

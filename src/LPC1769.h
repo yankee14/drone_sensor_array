@@ -1154,6 +1154,14 @@ typedef struct
 #define I2STAT_WO_MASK 0
 #define I2STAT_RW_MASK 0
 
+#define I2STAT_SINGLE_START_XMIT    0x08 // master transmitter and receiver
+#define I2STAT_REPEATED_START_XMIT  0x10 // master transmitter and receiver
+#define I2STAT_SLAVE_W_ACK_RECV     0x18 // master transmitter
+#define I2STAT_DATA_XMIT_ACK_RECV   0x28 // master transmitter
+#define I2STAT_SLAVE_R_ACK_RECV     0x40 // master receiver
+#define I2STAT_DATA_RECV_ACK_RET    0x50 // master receiver
+#define I2STAT_DATA_RECV_NACK_RET   0x58 // master receiver
+
 /* I2DAT register bits */
 #define Data    0//:7
 

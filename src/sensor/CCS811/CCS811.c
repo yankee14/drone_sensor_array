@@ -11,145 +11,142 @@
 
 #include "../../util/i2c.h"
 
-/**
- * Ensure the device is out of BOOT mode, and into running mode
- */
-void initCCS811(uint32_t drive_mode)
-{
-    uint32_t status = get_STATUS();
-
-    if( !(status & CCS811_STATUS_FW_MODE_MASK) ) { // if we are in BOOT mode
-        I2C0start();
-        I2C0write( (CCS811_I2C_ADDR << 1) | I2CWRITE);
-        I2C0write(CCS811_APP_START_ADDR);
-        I2C0stop();
-    }
-
-    status = get_STATUS();
-    if( !(status & CCS811_STATUS_FW_MODE_MASK) ) // check again
-        for(;;); // don't continue
-
-    set_MEAS_MODE(drive_mode << CCS811_DRIVE_MODE);
-}
-
 uint32_t get_STATUS(void)
 {
-    I2C0start();
-    I2C0write( (CCS811_I2C_ADDR << 1) | I2CWRITE);
-    I2C0write(CCS811_STATUS_ADDR);
-    I2C0start();
-    I2C0write( (CCS811_I2C_ADDR << 1) | I2CREAD);
-    uint32_t status = I2C0read(I2CNACK);
-    I2C0stop();
+    uint32_t reg_addr = CCS811_STATUS_ADDR;
+    I2C0write(CCS811_I2C_ADDR_SEC, &reg_addr, 1, 0);
+
+    uint32_t status;
+    I2C0read(CCS811_I2C_ADDR_SEC, &status, 1, 1);
+
     return status & CCS811_STATUS_RO_MASK;
 }
 
 uint32_t get_MEAS_MODE(void)
 {
-    I2C0start();
-    I2C0write( (CCS811_I2C_ADDR << 1) | I2CWRITE);
-    I2C0write(CCS811_MEAS_MODE_ADDR);
-    I2C0start();
-    I2C0write( (CCS811_I2C_ADDR << 1) | I2CREAD);
-    uint32_t meas_mode = I2C0read(I2CNACK);
-    I2C0stop();
+    uint32_t status;
+
+    uint32_t reg_addr = CCS811_MEAS_MODE_ADDR;
+    status = I2C0write(CCS811_I2C_ADDR_SEC, &reg_addr, 1, 0);
+    if(!status)
+        return -1;
+
+    uint32_t meas_mode;
+    status = I2C0read(CCS811_I2C_ADDR_SEC, &meas_mode, 1, 1);
+    if(!status)
+        return -1;
+
     return meas_mode & CCS811_MEAS_MODE_RW_MASK;
 }
 
 uint32_t* get_ALG_RESULT_DATA(uint32_t* data, uint32_t numBytes)
 {
-    if(numBytes > CCS811_ALG_RESULT_DATA_NUM_BYTES)
-        numBytes = CCS811_ALG_RESULT_DATA_NUM_BYTES;
-    I2C0start();
-    I2C0write( (CCS811_I2C_ADDR << 1) | I2CWRITE);
-    I2C0write(CCS811_ALG_RESULT_DATA_ADDR);
-    I2C0start();
-    I2C0write( (CCS811_I2C_ADDR << 1) | I2CREAD);
+    uint32_t status;
 
-    for(uint32_t i = 0; i < numBytes - 1; i++)
-        data[i] = I2C0read(I2CACK);
+    uint32_t reg_addr = CCS811_ALG_RESULT_DATA_ADDR;
+    status = I2C0write(CCS811_I2C_ADDR_SEC, &reg_addr, 1, 0);
+    if(!status)
+        return 0;
 
-    data[numBytes - 1] = I2C0read(I2CNACK); // end with NACK
+    status = I2C0read(CCS811_I2C_ADDR_SEC, data, numBytes, 1);
+    if(!status)
+        return 0;
 
-    I2C0stop();
     return data;
 }
 
 uint32_t* get_RAW_DATA(uint32_t* data)
 {
-    I2C0start();
-    I2C0write( (CCS811_I2C_ADDR << 1) | I2CWRITE);
-    I2C0write(CCS811_RAW_DATA_ADDR);
-    I2C0start();
-    I2C0write( (CCS811_I2C_ADDR << 1) | I2CREAD);
+//    I2C0start();
+//    I2C0write( (CCS811_I2C_ADDR_SEC) | I2CWRITE);
+//    I2C0write(CCS811_RAW_DATA_ADDR);
+//    I2C0start();
+//    I2C0write( (CCS811_I2C_ADDR_SEC) | I2CREAD);
+//
+//    for(uint32_t i = 0; i < CCS811_RAW_DATA_NUM_BYTES - 1; i++)
+//        data[i] = I2C0read(I2CACK);
+//
+//    data[CCS811_RAW_DATA_NUM_BYTES - 1] = I2C0read(I2CNACK); // end with NACK
+//
+//    I2C0stop();
+//    return data;
 
-    for(uint32_t i = 0; i < CCS811_RAW_DATA_NUM_BYTES - 1; i++)
-        data[i] = I2C0read(I2CACK);
-
-    data[CCS811_RAW_DATA_NUM_BYTES - 1] = I2C0read(I2CNACK); // end with NACK
-
-    I2C0stop();
-    return data;
+    return 0;
 }
 
 uint32_t* get_NTC(uint32_t* data)
 {
-    I2C0start();
-    I2C0write( (CCS811_I2C_ADDR << 1) | I2CWRITE);
-    I2C0write(CCS811_NTC_ADDR);
-    I2C0start();
-    I2C0write( (CCS811_I2C_ADDR << 1) | I2CREAD);
+//    I2C0start();
+//    I2C0write( (CCS811_I2C_ADDR_SEC) | I2CWRITE);
+//    I2C0write(CCS811_NTC_ADDR);
+//    I2C0start();
+//    I2C0write( (CCS811_I2C_ADDR_SEC) | I2CREAD);
+//
+//    for(uint32_t i = 0; i < CCS811_NTC_NUM_BYTES - 1; i++)
+//        data[i] = I2C0read(I2CACK);
+//
+//    data[CCS811_NTC_NUM_BYTES - 1] = I2C0read(I2CNACK); // end with NACK
+//
+//    I2C0stop();
+//    return data;
 
-    for(uint32_t i = 0; i < CCS811_NTC_NUM_BYTES - 1; i++)
-        data[i] = I2C0read(I2CACK);
-
-    data[CCS811_NTC_NUM_BYTES - 1] = I2C0read(I2CNACK); // end with NACK
-
-    I2C0stop();
-    return data;
+    return 0;
 }
 
 uint32_t get_HW_ID(void)
 {
-    I2C0start();
-    I2C0write( (CCS811_I2C_ADDR << 1) | I2CWRITE);
-    I2C0write(CCS811_HW_ID_ADDR);
-    I2C0start();
-    I2C0write( (CCS811_I2C_ADDR << 1) | I2CREAD);
-    uint32_t hw_id = I2C0read(I2CNACK);
-    I2C0stop();
+    uint32_t status;
+
+    uint32_t reg_addr = CCS811_HW_ID_ADDR;
+    status = I2C0write(CCS811_I2C_ADDR_SEC, &reg_addr, 1, 0);
+    if(!status)
+        return -1;
+
+    uint32_t hw_id;
+    status = I2C0read(CCS811_I2C_ADDR_SEC, &hw_id, 1, 1);
+    if(!status)
+        return -1;
+
     return hw_id;
 }
 
 uint32_t get_ERROR_ID(void)
 {
-    I2C0start();
-    I2C0write( (CCS811_I2C_ADDR << 1) | I2CWRITE);
-    I2C0write(CCS811_ERROR_ID_ADDR);
-    I2C0start();
-    I2C0write( (CCS811_I2C_ADDR << 1) | I2CREAD);
-    uint32_t error_id = I2C0read(I2CNACK);
-    I2C0stop();
+    uint32_t status;
+
+    uint32_t reg_addr = CCS811_ERROR_ID_ADDR;
+    status = I2C0write(CCS811_I2C_ADDR_SEC, &reg_addr, 1, 0);
+    if(!status)
+        return -1;
+
+    uint32_t error_id;
+    status = I2C0read(CCS811_I2C_ADDR_SEC, &error_id, 1, 1);
+    if(!status)
+        return -1;
+
     return error_id;
 }
 
 void set_MEAS_MODE(uint32_t data)
 {
-    I2C0start();
-    I2C0write( (CCS811_I2C_ADDR << 1) | I2CWRITE);
-    I2C0write(CCS811_MEAS_MODE_ADDR);
-    I2C0write(data);
-    I2C0stop();
+//    I2C0start();
+//    I2C0write( (CCS811_I2C_ADDR_SEC) | I2CWRITE);
+//    I2C0write(CCS811_MEAS_MODE_ADDR);
+//    I2C0write(data);
+//    I2C0stop();
+
+    uint32_t meas_mode[] = {CCS811_MEAS_MODE_ADDR, data};
+    I2C0write(CCS811_I2C_ADDR_SEC, meas_mode, 2, 1);
 }
 
 void set_ENV_DATA(uint32_t* data)
 {
-    I2C0start();
-    I2C0write( (CCS811_I2C_ADDR) | I2CWRITE);
-    I2C0write(CCS811_ENV_DATA_ADDR);
-
-    for(uint32_t i = 0; i < CCS811_ENV_DATA_NUM_BYTES; i++)
-        I2C0write(data[i]);
-
-    I2C0stop();
+//    I2C0start();
+//    I2C0write( (CCS811_I2C_ADDR_SEC) | I2CWRITE);
+//    I2C0write(CCS811_ENV_DATA_ADDR);
+//
+//    for(uint32_t i = 0; i < CCS811_ENV_DATA_NUM_BYTES; i++)
+//        I2C0write(data[i]);
+//
+//    I2C0stop();
 }
