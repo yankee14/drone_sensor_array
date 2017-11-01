@@ -120,13 +120,20 @@ int8_t user_i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16
      * | Stop       | -                   |
      * |------------+---------------------|
      */
-    rslt = I2C0write(BME280_I2C_ADDR_SEC, (uint32_t*)&reg_addr, 1, 1);
+    uint32_t reg_addr_32 = reg_addr & 0xFF;
+    rslt = I2C0write(BME280_I2C_ADDR_SEC, &reg_addr_32, 1, 1);
     if(!rslt)
         return -1;
 
-    rslt = I2C0read(BME280_I2C_ADDR_SEC, (uint32_t*)reg_data, len, 1);
+    uint32_t reg_data_32[len];
+    for(uint32_t i = 0; i < len; i++)
+        reg_data_32[i] = reg_data[i];
+    rslt = I2C0read(BME280_I2C_ADDR_SEC, reg_data_32, len, 1);
     if(!rslt)
         return -1;
+
+    for(uint32_t i = 0; i < len; i++)
+        reg_data[i] = reg_data_32[i] & 0xFF;
 
     return 0;
 }
@@ -152,12 +159,17 @@ int8_t user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint1
      * | Stop       | -                   |
      * |------------+---------------------|
      */
+    uint32_t reg_addr_32 = reg_addr & 0xFF;
 
-    rslt = I2C0write(BME280_I2C_ADDR_SEC, (uint32_t*)&reg_addr, 1, 0);
+    rslt = I2C0write(BME280_I2C_ADDR_SEC, &reg_addr_32, 1, 0);
     if(!rslt)
         return -1;
 
-    rslt = I2C0write(BME280_I2C_ADDR_SEC, (uint32_t*)reg_data, len, 1);
+    uint32_t reg_data_32[len];
+    for(uint32_t i = 0; i < len; i++)
+        reg_data_32[i] = reg_data[i] & 0xFF;
+
+    rslt = I2C0write(BME280_I2C_ADDR_SEC, reg_data_32, len, 1);
     if(!rslt)
         return -1;
 
