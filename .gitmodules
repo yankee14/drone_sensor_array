@@ -2,3 +2,7 @@
 	path = doc/GPS/Adafruit_GPS
 	url = https://github.com/adafruit/Adafruit_GPS.git
 	ignore = dirty
+[submodule "src/sensor/BME280_driver"]
+	path = src/sensor/BME280_driver
+	url = https://github.com/BoschSensortec/BME280_driver.git
+	ignore = dirty
