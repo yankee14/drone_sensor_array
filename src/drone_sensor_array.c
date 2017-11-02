@@ -85,7 +85,7 @@ void testCCS811(void)
 
     printf("Error: 0x%02X\n", get_ERROR_ID()); // print error register
 
-    printf("Measure Mode: 0x%02X\n\n\n", get_MEAS_MODE()); // print measure_mode register
+    printf("Measure Mode: 0x%02X\n\n", get_MEAS_MODE()); // print measure_mode register
 }
 
 void user_delay_ms(uint32_t period)
@@ -198,12 +198,10 @@ int8_t stream_sensor_data_normal_mode(struct bme280_dev *dev)
 	rslt = bme280_set_sensor_mode(BME280_NORMAL_MODE, dev);
 
 	printf("Temperature, Pressure, Humidity\r\n");
-	while (1) {
-		/* Delay while the sensor completes a measurement */
-		dev->delay_ms(70);
-		rslt = bme280_get_sensor_data(BME280_ALL, &comp_data, dev);
-		print_sensor_data(&comp_data);
-	}
+    /* Delay while the sensor completes a measurement */
+    dev->delay_ms(70);
+    rslt = bme280_get_sensor_data(BME280_ALL, &comp_data, dev);
+    print_sensor_data(&comp_data);
 
 	return rslt;
 }
@@ -221,18 +219,19 @@ int main(void)
 {
     init();
 
-    struct bme280_dev dev;
-    int8_t rslt = BME280_OK;
-
-    dev.dev_id = BME280_I2C_ADDR_SEC;
-    dev.intf = BME280_I2C_INTF;
-    dev.read = user_i2c_read;
-    dev.write = user_i2c_write;
-    dev.delay_ms = user_delay_ms;
-
-    rslt = bme280_init(&dev);
 
     for(;;) {
+        struct bme280_dev dev;
+        int8_t rslt = BME280_OK;
+
+        dev.dev_id = BME280_I2C_ADDR_SEC;
+        dev.intf = BME280_I2C_INTF;
+        dev.read = user_i2c_read;
+        dev.write = user_i2c_write;
+        dev.delay_ms = user_delay_ms;
+
+        rslt = bme280_init(&dev);
+        rslt = stream_sensor_data_normal_mode(&dev);
         testCCS811();
 
         _delay_ms(1000 * 5); // pause microcontroller
