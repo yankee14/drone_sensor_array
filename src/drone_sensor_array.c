@@ -100,7 +100,7 @@ void user_delay_ms(uint32_t period)
 
 int8_t user_i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len)
 {
-    int8_t rslt = 0; /* Return 0 for Success, non-zero for failure */
+    int8_t rslt = 0; /* Return 0 for Success, non-zero for failure *//** Insert this after the read code */
 
     /*
      * The parameter dev_id can be used as a variable to store the I2C address of the device
@@ -136,12 +136,24 @@ int8_t user_i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16
     for(uint32_t i = 0; i < len; i++)
         reg_data[i] = reg_data_32[i] & 0xFF;
 
+    /** Insert this after the read code */
+    printf("RD: %d, %d", reg_addr, len);
+    for(uint16_t idx = 0; idx < len; idx++)
+        printf(" 0x%x", reg_data[idx]);
+    printf("\r\n");
+
     return 0;
 }
 
 int8_t user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len)
 {
     int8_t rslt = 0; /* Return 0 for Success, non-zero for failure */
+
+    /** Insert this before the write code */
+    printf("WR: %d, %d", reg_addr, len);
+    for(uint16_t idx = 0; idx < len; idx++)
+        printf(" 0x%x", reg_data[idx]);
+    printf("\r\n");
 
     /*
      * The parameter dev_id can be used as a variable to store the I2C address of the device
@@ -173,6 +185,8 @@ int8_t user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint1
     rslt = I2C0write(BME280_I2C_ADDR_SEC, reg_data_32, len, 1);
     if(!rslt)
         return -1;
+
+
 
     return 0;
 }
