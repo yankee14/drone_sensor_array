@@ -25,12 +25,13 @@ int8_t user_i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16
 int8_t user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len);
 int8_t stream_sensor_data_normal_mode(struct bme280_dev *dev);
 void print_sensor_data(struct bme280_data *comp_data);
+void handle_bme280_error(int8_t _rslt);
 
 void init(void)
 {
     I2C0init2(5, 5); // setup I2C bus, freq 100 kHz
 
-    initCCS811(CCS811_INT_THRESH_DISABLE, CCS811_INT_DATARDY_ENABLE, CCS811_DRIVE_MODE_1); // set 1 Hz readings
+//    initCCS811(CCS811_INT_THRESH_DISABLE, CCS811_INT_DATARDY_ENABLE, CCS811_DRIVE_MODE_1); // set 1 Hz readings
 }
 
 /**
@@ -215,24 +216,41 @@ void print_sensor_data(struct bme280_data *comp_data)
 #endif
 }
 
+void handle_bme280_error(int8_t _rslt)
+{
+    if (_rslt < BME280_OK) {
+        printf("BME280 Error code: %d", _rslt);
+        for(;;); /* Trap if error */
+    } else if (_rslt > BME280_OK) {
+        printf("BME280 Warning code: %d", _rslt);
+    }
+}
+
 int main(void)
 {
     init();
+    struct bme280_dev dev;
+    struct bme280_data comp_data;
+    int8_t rslt = BME280_OK;
 
+    dev.dev_id = BME280_I2C_ADDR_SEC;
+    dev.intf = BME280_I2C_INTF;
+    dev.read = user_i2c_read;
+    dev.write = user_i2c_write;
+    dev.delay_ms = user_delay_ms;
+
+    rslt = bme280_init(&dev);
+    handle_bme280_error(rslt);
+
+    rslt = stream_sensor_data_normal_mode(&dev);
+    handle_bme280_error(rslt);
 
     for(;;) {
-        struct bme280_dev dev;
-        int8_t rslt = BME280_OK;
+        rslt = bme280_get_sensor_data(BME280_ALL, &comp_data, &dev);
+        handle_bme280_error(rslt);
+        print_sensor_data(&comp_data);
 
-        dev.dev_id = BME280_I2C_ADDR_SEC;
-        dev.intf = BME280_I2C_INTF;
-        dev.read = user_i2c_read;
-        dev.write = user_i2c_write;
-        dev.delay_ms = user_delay_ms;
-
-        rslt = bme280_init(&dev);
-        rslt = stream_sensor_data_normal_mode(&dev);
-        testCCS811();
+//        testCCS811();
 
         _delay_ms(1000 * 5); // pause microcontroller
     }
