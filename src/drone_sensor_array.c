@@ -15,6 +15,10 @@
 #include "sensor/BME280_driver/bme280.h" // hocus pocus pressure sensor math
 #include "sensor/CCS811/CCS811.h" // CO2 and TVOC sensor
 
+#ifndef USER_I2C_DEBUG
+//#define USER_I2C_DEBUG
+#endif
+
 void init(void);
 void initCCS811(uint32_t nINTonDataThreshold, uint32_t nINTonDataReady, uint32_t drive_mode);
 
@@ -24,14 +28,14 @@ void user_delay_ms(uint32_t period);
 int8_t user_i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len);
 int8_t user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len);
 int8_t stream_sensor_data_normal_mode(struct bme280_dev *dev);
-void print_sensor_data(struct bme280_data *comp_data);
+void print_bme280_data(struct bme280_data *comp_data);
 void handle_bme280_error(int8_t _rslt);
 
 void init(void)
 {
     I2C0init2(5, 5); // setup I2C bus, freq 100 kHz
 
-//    initCCS811(CCS811_INT_THRESH_DISABLE, CCS811_INT_DATARDY_ENABLE, CCS811_DRIVE_MODE_1); // set 1 Hz readings
+    initCCS811(CCS811_INT_THRESH_DISABLE, CCS811_INT_DATARDY_ENABLE, CCS811_DRIVE_MODE_1); // set 1 Hz readings
 }
 
 /**
@@ -54,11 +58,6 @@ void initCCS811(uint32_t nINTonDataThreshold, uint32_t nINTonDataReady, uint32_t
 
 void testCCS811(void)
 {
-    time_t rawtime;
-    struct tm* timeinfo;
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    printf("Current local time and date: %s", asctime (timeinfo));
 
     printf("Error ID: 0x%02X\n", get_ERROR_ID()); // print error register
 
@@ -136,11 +135,13 @@ int8_t user_i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16
     for(uint32_t i = 0; i < len; i++)
         reg_data[i] = reg_data_32[i] & 0xFF;
 
+#ifdef USER_I2C_DEBUG
     /** Insert this after the read code */
     printf("RD: %d, %d", reg_addr, len);
     for(uint16_t idx = 0; idx < len; idx++)
         printf(" 0x%x", reg_data[idx]);
     printf("\r\n");
+#endif
 
     return 0;
 }
@@ -149,11 +150,13 @@ int8_t user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint1
 {
     int8_t rslt = 0; /* Return 0 for Success, non-zero for failure */
 
+#ifdef USER_I2C_DEBUG
     /** Insert this before the write code */
     printf("WR: %d, %d", reg_addr, len);
     for(uint16_t idx = 0; idx < len; idx++)
         printf(" 0x%x", reg_data[idx]);
     printf("\r\n");
+#endif
 
     /*
      * The parameter dev_id can be used as a variable to store the I2C address of the device
@@ -165,13 +168,16 @@ int8_t user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint1
      * | I2C action | Data                |
      * |------------+---------------------|
      * | Start      | -                   |
-     * | Write      | (reg_addr)          |
+     * | Write      | (reg_addr)          | NOTE NO RESTART CONDITION ALLOWED
      * | Write      | (reg_data[0])       |
      * | Write      | (....)              |
      * | Write      | (reg_data[len - 1]) |
      * | Stop       | -                   |
      * |------------+---------------------|
      */
+
+    /*
+     * BAD CODE, HAS I2C RESTART AFTER REG WRITE
     uint32_t reg_addr_32 = reg_addr & 0xFF;
 
     rslt = I2C0write(BME280_I2C_ADDR_SEC, &reg_addr_32, 1, 0);
@@ -185,8 +191,17 @@ int8_t user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint1
     rslt = I2C0write(BME280_I2C_ADDR_SEC, reg_data_32, len, 1);
     if(!rslt)
         return -1;
+     */
 
+    uint32_t reg_32[len + 1]; // hold reg_addr, followed by all data
+    reg_32[0] = reg_addr & 0xFF;
 
+    for(uint32_t i = 1; i < len + 1; i++)
+        reg_32[i] = reg_data[i - 1] & 0xFF;
+
+    rslt = I2C0write(dev_id, reg_32, len + 1, 1);
+    if(!rslt)
+        return -1;
 
     return 0;
 }
@@ -212,21 +227,21 @@ int8_t stream_sensor_data_normal_mode(struct bme280_dev *dev)
 	rslt = bme280_set_sensor_settings(settings_sel, dev);
 	rslt = bme280_set_sensor_mode(BME280_NORMAL_MODE, dev);
 
-	printf("Temperature, Pressure, Humidity\r\n");
     /* Delay while the sensor completes a measurement */
     dev->delay_ms(70);
     rslt = bme280_get_sensor_data(BME280_ALL, &comp_data, dev);
-    print_sensor_data(&comp_data);
 
 	return rslt;
 }
 
-void print_sensor_data(struct bme280_data *comp_data)
+void print_bme280_data(struct bme280_data *comp_data)
 {
+    printf("           BME280 Data:\n");
+	printf("    Temperature    |    Pressure    |    Humidity\n");
 #ifdef BME280_FLOAT_ENABLE
-        printf("%0.2f, %0.2f, %0.2f\r\n",comp_data->temperature, comp_data->pressure, comp_data->humidity);
+    printf("     %0.2f deg C       %0.2f Pa        %0.2f %%\n\n",comp_data->temperature, comp_data->pressure, comp_data->humidity);
 #else
-        printf("%ld, %ld, %ld\r\n",comp_data->temperature, comp_data->pressure, comp_data->humidity);
+    printf("     %ld deg C         %ld Pa          %ld %%\n\n",comp_data->temperature, comp_data->pressure, comp_data->humidity);
 #endif
 }
 
@@ -260,12 +275,20 @@ int main(void)
     handle_bme280_error(rslt);
 
     for(;;) {
+        time_t rawtime;
+        struct tm* timeinfo;
+        time(&rawtime);
+        timeinfo = localtime(&rawtime);
+        printf("UTC time and date: %s\n", asctime (timeinfo));
+
         rslt = bme280_get_sensor_data(BME280_ALL, &comp_data, &dev);
         handle_bme280_error(rslt);
-        print_sensor_data(&comp_data);
+        print_bme280_data(&comp_data);
 
 //        testCCS811();
 
+        uint32_t delay_sec = 5;
+        printf("        Delaying %ld seconds...\n\n", delay_sec);
         _delay_ms(1000 * 5); // pause microcontroller
     }
 
