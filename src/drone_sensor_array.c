@@ -59,33 +59,33 @@ void initCCS811(uint32_t nINTonDataThreshold, uint32_t nINTonDataReady, uint32_t
 void testCCS811(void)
 {
 
-    printf("Error ID: 0x%02X\n", get_ERROR_ID()); // print error register
-
-    printf("Status: 0x%02X\n", get_STATUS()); // print status register
-
-    printf("Error ID: 0x%02X\n", get_ERROR_ID()); // print error register
-
-    printf("Hardware ID read: 0x%02X, should read: 0x81\n", get_HW_ID()); // print HW_ID register
-
-    printf("Error ID: 0x%02X\n", get_ERROR_ID()); // print error register
+//    printf("Error ID: 0x%02X\n", get_ERROR_ID()); // print error register
+//
+//    printf("Status: 0x%02X\n", get_STATUS()); // print status register
+//
+//    printf("Error ID: 0x%02X\n", get_ERROR_ID()); // print error register
+//
+//    printf("Hardware ID read: 0x%02X, should read: 0x81\n", get_HW_ID()); // print HW_ID register
+//
+//    printf("Error ID: 0x%02X\n", get_ERROR_ID()); // print error register
 
     uint32_t result[8];
     get_ALG_RESULT_DATA(result, 8); // get CO2 and TVOC
 
-    printf("Error ID: 0x%02X\n", get_ERROR_ID()); // print error register
-
+//    printf("Error ID: 0x%02X\n", get_ERROR_ID()); // print error register
+//
     printf("Result: ");
     for(uint32_t i = 0; i < 8; i++)
         printf("0x%02X ", result[i]); // print CO2, TVOC, status register, error register, and RAW_DATA
     printf("\n");
-
-    printf("Error ID: 0x%02X\n", get_ERROR_ID()); // print error register
-
-    printf("Status: 0x%02X\n", get_STATUS()); // print status register
-
-    printf("Error: 0x%02X\n", get_ERROR_ID()); // print error register
-
-    printf("Measure Mode: 0x%02X\n\n", get_MEAS_MODE()); // print measure_mode register
+//
+//    printf("Error ID: 0x%02X\n", get_ERROR_ID()); // print error register
+//
+//    printf("Status: 0x%02X\n", get_STATUS()); // print status register
+//
+//    printf("Error: 0x%02X\n", get_ERROR_ID()); // print error register
+//
+//    printf("Measure Mode: 0x%02X\n\n", get_MEAS_MODE()); // print measure_mode register
 }
 
 void user_delay_ms(uint32_t period)
@@ -285,12 +285,12 @@ int main(void)
         handle_bme280_error(rslt);
         print_bme280_data(&comp_data);
 
-//        testCCS811();
+        testCCS811();
 
         uint32_t delay_sec = 5;
         printf("        Delaying %ld seconds...\n\n", delay_sec);
         _delay_ms(1000 * 5); // pause microcontroller
     }
 
-    return 0 ;
+    return 0;
 }
